@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.circular{
+    display: relative;
+    height: 400px;
+    width: 400px;
+    background-color: aqua;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circular::before{
+    content: "";
+    background-color: aqua;
+    height: 370px;
+    width: 370px;
+    position: absolute;
+    border-radius: 50%;
+}

@@ -1,59 +1,53 @@
 import React, { useEffect, useState } from 'react';
-import { BsSearch } from "react-icons/bs";
 
 const App = () => {
+    const [percent, setPercent] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
 
-  const [allData, setAllData] = useState([]);
-  const [initialData, setInitialData] = useState([]);
-
-  useEffect(() => {
-    fetch('https://api.punkapi.com/v2/beers')
-      .then(res => res.json())
-      .then(data => {
-        setAllData(data)
-        setInitialData(data)
-      })
-  }, [])
-
-
-  const [title, setTitle] = useState('');
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    const filtered = initialData.filter(item => {
-      return item.name.toLowerCase().startsWith(title.toLocaleLowerCase());
-    })
-    setAllData(filtered)
-  }
-
-  return (
-    <div>
-      {/* search section */}
-      <form onSubmit={handleSubmit} className='my-10 flex justify-center'>
-        <input onChange={e => setTitle(e.target.value)} type="text" placeholder="Type here" className="input input-bordered w-full max-w-xs" />
-        <button type='submit' className="btn btn-warning">
-          <BsSearch></BsSearch>
-        </button>
-      </form>
-
-
-      {/* display all card section */}
-      <div className='grid md:grid-cols-3 gap-4'>
-        {
-          allData.map(item => <div key={item.id} className="card card-compact w-96 bg-base-100 shadow-xl">
-            <figure><img className='h-[200px]' src={item.image_url} alt="Shoes" /></figure>
-            <div className="card-body">
-              <h2 className="card-title">{item.name}</h2>
-              <div>{item.description.length >= 40 ? <p>{item.description.slice(0, 40)} ...</p> : item.description}</div>
-              <div className="card-actions justify-end">
-                <button className="btn btn-primary">Buy Now</button>
-              </div>
-            </div>
-          </div>)
+    useEffect(() => {
+        if (!isPaused) {
+            const id = setInterval(() => {
+                if (percent < 100) {
+                    setPercent(percent + 1);
+                } else {
+                    clearInterval(id);
+                }
+            }, 1000);
+            return () => clearInterval(id);
         }
-      </div>
-    </div>
-  );
+    }, [percent, isPaused]);
+
+    const style = {
+        background: `conic-gradient(red ${percent * 3.6}deg, gray 0deg)`
+    }
+
+    const handlePause = () => {
+        setIsPaused(true)
+    }
+
+    const handleResume = () => {
+        setIsPaused(false)
+    }
+
+    return (
+        <div>
+            <div className='flex items-center justify-center'>
+                <div className='circular' style={style} >
+                    <h1 className='text-red-500 font-bold text-5xl z-10'>
+                        {percent}%
+                    </h1>
+                </div>
+            </div>
+            <div className='flex justify-center items-center mt-10 gap-x-10'>
+                <button className='btn btn-error' onClick={() => handlePause()}>
+                    Pause
+                </button>
+                <button className='btn btn-warning' onClick={() => handleResume()}>
+                    Resume
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export default App;
